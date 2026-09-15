@@ -1,0 +1,95 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:tantargyvalaszto.ViewModels"
+        xmlns:controls="using:tantargyvalaszto.Controls"
+        xmlns:models="using:tantargyvalaszto.Models"
+        x:Class="tantargyvalaszto.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Tárgyválasztó - Szerencsekerék"
+        Width="1050" Height="650"
+        MinWidth="800" MinHeight="500"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="2*, 1*" Margin="15">
+        <!-- BAL OLDAL: Felvitel, Szerencsekerék, Sorsolás gomb -->
+        <Grid Grid.Column="0" RowDefinitions="Auto, Auto, *, Auto" Margin="0,0,15,0">
+            
+            <!-- Fejléc és Témaváltó -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                <Button DockPanel.Dock="Right" Content="🌙/☀️ Téma" Command="{Binding ToggleThemeCommand}"/>
+                <TextBlock Text="Tárgyválasztó Szerencsekerék" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <!-- Input mező -->
+            <StackPanel Grid.Row="1" Spacing="8">
+                <Grid ColumnDefinitions="*, Auto">
+                    <TextBox Grid.Column="0" Text="{Binding NewSubjectName, Mode=TwoWay}" 
+                             Watermark="Új tárgy neve (max 25 karakter)..." 
+                             MaxLength="25"
+                             Margin="0,0,8,0">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter" Command="{Binding AddSubjectCommand}"/>
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                    <Button Grid.Column="1" Content="Hozzáadás" Command="{Binding AddSubjectCommand}" IsEnabled="{Binding CanAdd}"/>
+                </Grid>
+
+                <!-- Hibaüzenet -->
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" 
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
+                           FontSize="12" FontWeight="SemiBold"/>
+            </StackPanel>
+
+            <!-- Kerék Control -->
+            <Grid Grid.Row="2" Margin="0,15,0,15">
+                <controls:WheelControl Items="{Binding Subjects}" Angle="{Binding WheelAngle}"/>
+            </Grid>
+
+            <!-- Sorsolás és Nyertes Eredmény kijelző -->
+            <StackPanel Grid.Row="3" Spacing="8" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding SelectedResultText}" FontSize="18" FontWeight="Bold" 
+                           HorizontalAlignment="Center" Foreground="#3498DB" TextWrapping="Wrap"/>
+                <Button Content="🎲 SORSOLÁS" Command="{Binding SpinCommand}" IsEnabled="{Binding CanSpin}"
+                        FontSize="16" FontWeight="Bold" Padding="30,10" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- JOBB OLDAL: Lista, törlés (X) ÉS számláló -->
+        <Border Grid.Column="1" CornerRadius="8" Padding="10" Background="{DynamicResource SystemRegionBrush}">
+            <Grid RowDefinitions="Auto, *, Auto">
+                <TextBlock Grid.Row="0" Text="Felvitt Tárgyak" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                
+                <!-- Tárgyak Listája -->
+                <ListBox Grid.Row="1" ItemsSource="{Binding Subjects}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="models:SubjectItem">
+                            <Grid ColumnDefinitions="Auto, *, Auto" Margin="2">
+                                <Border Grid.Column="0" Width="12" Height="12" CornerRadius="6" 
+                                        Background="{Binding Brush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                
+                                <Button Grid.Column="2" Content="✕" Foreground="Red" Background="Transparent"
+                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RemoveSubjectCommand}"
+                                        CommandParameter="{Binding}" Padding="6,2" Margin="5,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Számláló Kártya a Lista Alján -->
+                <Border Grid.Row="2" Margin="0,10,0,0" Padding="8" CornerRadius="5" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                    <TextBlock Text="{Binding RemainingCountText}" 
+                               HorizontalAlignment="Center" 
+                               FontWeight="SemiBold" 
+                               FontSize="13"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
