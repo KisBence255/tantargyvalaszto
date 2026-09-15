@@ -7,87 +7,208 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="Tárgyválasztó - Szerencsekerék"
-        Width="1050" Height="650"
-        MinWidth="800" MinHeight="500"
-        WindowStartupLocation="CenterScreen">
+        Width="1080" Height="680"
+        MinWidth="850" MinHeight="550"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBackgroundBrush}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid ColumnDefinitions="2*, 1*" Margin="15">
-        <!-- BAL OLDAL: Felvitel, Szerencsekerék, Sorsolás gomb -->
-        <Grid Grid.Column="0" RowDefinitions="Auto, Auto, *, Auto" Margin="0,0,15,0">
+    <!-- TÉMA SZÓTÁR DEFINÍCIÓK (LIGHT ÉS DARK MÓDHOZ) -->
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                
+                <!-- Sötét téma ecsetei -->
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0F172A"/>
+                    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#1E293B"/>
+                    <SolidColorBrush x:Key="CardBorderBrush" Color="#334155"/>
+                    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F8FAFC"/>
+                    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8"/>
+                    <SolidColorBrush x:Key="InnerCardBackgroundBrush" Color="#0F172A"/>
+                    <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#1E293B"/>
+                    <SolidColorBrush x:Key="SecondaryButtonBackgroundBrush" Color="#334155"/>
+                    <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="#475569"/>
+                </ResourceDictionary>
+
+                <!-- Világos téma ecsetei -->
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F8FAFC"/>
+                    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="CardBorderBrush" Color="#E2E8F0"/>
+                    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A"/>
+                    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
+                    <SolidColorBrush x:Key="InnerCardBackgroundBrush" Color="#F1F5F9"/>
+                    <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="SecondaryButtonBackgroundBrush" Color="#E2E8F0"/>
+                    <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="#CBD5E1"/>
+                </ResourceDictionary>
+
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <!-- KÖZPONTI STÍLUS DEFINÍCIÓK (DYNAMICRESOURCE-OKKAL) -->
+    <Window.Styles>
+        <!-- Modern TextBox Stílus -->
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#6366F1"/>
+            <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        </Style>
+
+        <!-- Elsődleges Akció Gomb (Sorsolás) -->
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#6366F1"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="24,12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#4F46E5"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="Button.primary:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        </Style>
+
+        <!-- Másodlagos Gomb (Hozzáadás, Téma) -->
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="{DynamicResource SecondaryButtonBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Button.secondary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryButtonHoverBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+
+        <!-- Törlés gomb a listában -->
+        <Style Selector="Button.delete-btn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+        <Style Selector="Button.delete-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#EF4444"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="2.2*, 1*" Margin="20">
+        
+        <!-- BAL OLDAL: Kerék és Kezelőfelület -->
+        <Grid Grid.Column="0" RowDefinitions="Auto, Auto, *, Auto" Margin="0,0,20,0">
             
             <!-- Fejléc és Témaváltó -->
-            <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                <Button DockPanel.Dock="Right" Content="🌙/☀️ Téma" Command="{Binding ToggleThemeCommand}"/>
-                <TextBlock Text="Tárgyválasztó Szerencsekerék" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+            <DockPanel Grid.Row="0" Margin="0,0,0,15">
+                <Button DockPanel.Dock="Right" Classes="secondary" Content="🌙 / ☀️ Téma" Command="{Binding ToggleThemeCommand}"/>
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Border Width="8" Height="24" CornerRadius="4" Background="#6366F1"/>
+                    <TextBlock Text="Tárgyválasztó Szerencsekerék" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                </StackPanel>
             </DockPanel>
 
-            <!-- Input mező -->
+            <!-- Input mező panel -->
             <StackPanel Grid.Row="1" Spacing="8">
                 <Grid ColumnDefinitions="*, Auto">
                     <TextBox Grid.Column="0" Text="{Binding NewSubjectName, Mode=TwoWay}" 
                              Watermark="Új tárgy neve (max 25 karakter)..." 
                              MaxLength="25"
-                             Margin="0,0,8,0">
+                             Margin="0,0,10,0">
                         <TextBox.KeyBindings>
                             <KeyBinding Gesture="Enter" Command="{Binding AddSubjectCommand}"/>
                         </TextBox.KeyBindings>
                     </TextBox>
-                    <Button Grid.Column="1" Content="Hozzáadás" Command="{Binding AddSubjectCommand}" IsEnabled="{Binding CanAdd}"/>
+                    <Button Grid.Column="1" Classes="secondary" Content="+ Hozzáadás" Command="{Binding AddSubjectCommand}" IsEnabled="{Binding CanAdd}"/>
                 </Grid>
 
-                <!-- Hibaüzenet -->
-                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" 
-                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
-                           FontSize="12" FontWeight="SemiBold"/>
+                <!-- Hibaüzenet kijelző -->
+                <Border Background="#2D1A22" BorderBrush="#F87171" BorderThickness="1" CornerRadius="6" Padding="10,6"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#F87171" FontSize="13" FontWeight="Medium"/>
+                </Border>
             </StackPanel>
 
-            <!-- Kerék Control -->
-            <Grid Grid.Row="2" Margin="0,15,0,15">
+            <!-- Kerék Kijelző Terület -->
+            <Border Grid.Row="2" Margin="0,15,0,15" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="16" Padding="20" ClipToBounds="True">
                 <controls:WheelControl Items="{Binding Subjects}" Angle="{Binding WheelAngle}"/>
-            </Grid>
+            </Border>
 
-            <!-- Sorsolás és Nyertes Eredmény kijelző -->
-            <StackPanel Grid.Row="3" Spacing="8" HorizontalAlignment="Center">
-                <TextBlock Text="{Binding SelectedResultText}" FontSize="18" FontWeight="Bold" 
-                           HorizontalAlignment="Center" Foreground="#3498DB" TextWrapping="Wrap"/>
-                <Button Content="🎲 SORSOLÁS" Command="{Binding SpinCommand}" IsEnabled="{Binding CanSpin}"
-                        FontSize="16" FontWeight="Bold" Padding="30,10" HorizontalAlignment="Center"/>
-            </StackPanel>
+            <!-- Sorsolási Eredmény & Akció Gomb -->
+            <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="12" Padding="15,12">
+                <Grid ColumnDefinitions="*, Auto" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="10,0">
+                        <TextBlock Text="SORSOLÁS EREDMÉNYE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" LetterSpacing="1"/>
+                        <TextBlock Text="{Binding SelectedResultText}" FontSize="18" FontWeight="Bold" Foreground="#38BDF8" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="primary" Content="🎲 SORSOLÁS" Command="{Binding SpinCommand}" IsEnabled="{Binding CanSpin}"/>
+                </Grid>
+            </Border>
         </Grid>
 
-        <!-- JOBB OLDAL: Lista, törlés (X) ÉS számláló -->
-        <Border Grid.Column="1" CornerRadius="8" Padding="10" Background="{DynamicResource SystemRegionBrush}">
+        <!-- JOBB OLDAL: Felvitt Tárgyak Listája -->
+        <Border Grid.Column="1" CornerRadius="16" Padding="16" Background="{DynamicResource CardBackgroundBrush}">
             <Grid RowDefinitions="Auto, *, Auto">
-                <TextBlock Grid.Row="0" Text="Felvitt Tárgyak" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
                 
-                <!-- Tárgyak Listája -->
-                <ListBox Grid.Row="1" ItemsSource="{Binding Subjects}">
+                <!-- Lista Fejléc -->
+                <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                    <TextBlock Text="Felvitt Tárgyak" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                </DockPanel>
+                
+                <!-- Tárgyak Listája Stilizált Kártyákkal -->
+                <ListBox Grid.Row="1" ItemsSource="{Binding Subjects}" Background="Transparent">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,0,0,6"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                    </ListBox.Styles>
+
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="models:SubjectItem">
-                            <Grid ColumnDefinitions="Auto, *, Auto" Margin="2">
-                                <Border Grid.Column="0" Width="12" Height="12" CornerRadius="6" 
-                                        Background="{Binding Brush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                
-                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                
-                                <Button Grid.Column="2" Content="✕" Foreground="Red" Background="Transparent"
-                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RemoveSubjectCommand}"
-                                        CommandParameter="{Binding}" Padding="6,2" Margin="5,0,0,0"/>
-                            </Grid>
+                            <Border Background="{DynamicResource InnerCardBackgroundBrush}" CornerRadius="8" Padding="10,8" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1">
+                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                    <Border Grid.Column="0" Width="10" Height="10" CornerRadius="5" 
+                                            Background="{Binding Brush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}" 
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <Button Grid.Column="2" Classes="delete-btn" Content="✕" 
+                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RemoveSubjectCommand}"
+                                            CommandParameter="{Binding}"/>
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <!-- Számláló Kártya a Lista Alján -->
-                <Border Grid.Row="2" Margin="0,10,0,0" Padding="8" CornerRadius="5" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
-                    <TextBlock Text="{Binding RemainingCountText}" 
-                               HorizontalAlignment="Center" 
-                               FontWeight="SemiBold" 
-                               FontSize="13"/>
+                <!-- Számláló Badge a Lista Alján -->
+                <Border Grid.Row="2" Margin="0,12,0,0" Padding="10" CornerRadius="8" Background="{DynamicResource InnerCardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+                        <TextBlock Text="📊" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding RemainingCountText}" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                    </StackPanel>
                 </Border>
             </Grid>
         </Border>
